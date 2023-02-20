@@ -1,9 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import axios from 'axios';
+import { HttpService } from '@nestjs/axios/dist';
 import { IGetTokenResp } from './models';
+import { firstValueFrom } from 'rxjs';
 
 @Injectable()
 export class AppService {
+  constructor(private readonly httpService: HttpService) {}
+
   async getToken(): Promise<IGetTokenResp> {
     const token = await axios.get<IGetTokenResp>(
       'https://test.gnzs.ru/oauth/get-token.php',
@@ -18,17 +22,20 @@ export class AppService {
     return token.data;
   }
 
-  async createDeal() {
+  async createDeal(): Promise<any> {
     const { base_domain, access_token } = await this.getToken();
     try {
-      const deal = await axios.post(`https:${base_domain}/api/v4/leads`, {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${access_token}`,
-        },
-      });
-      return deal;
+      const { data } = await firstValueFrom(
+        this.httpService.post(`https:${base_domain}/api/v4/leads`, {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${access_token}`,
+          },
+        }),
+      );
+      return data;
     } catch (e) {
+      console.log(e);
       return e;
     }
   }
@@ -36,14 +43,17 @@ export class AppService {
   async createContact() {
     const { base_domain, access_token } = await this.getToken();
     try {
-      const contact = await axios.post(`https:${base_domain}/api/v4/contacts`, {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${access_token}`,
-        },
-      });
-      return contact;
+      const { data } = await firstValueFrom(
+        this.httpService.post(`https:${base_domain}/api/v4/contacts`, {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${access_token}`,
+          },
+        }),
+      );
+      return data;
     } catch (e) {
+      console.log(e);
       return e;
     }
   }
@@ -51,17 +61,17 @@ export class AppService {
   async createCompany() {
     const { base_domain, access_token } = await this.getToken();
     try {
-      const company = await axios.post(
-        `https:${base_domain}/api/v4/companiess`,
-        {
+      const { data } = await firstValueFrom(
+        this.httpService.post(`https:${base_domain}/api/v4/companiess`, {
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${access_token}`,
           },
-        },
+        }),
       );
-      return company;
+      return data;
     } catch (e) {
+      console.log('error:' + e);
       return e;
     }
   }

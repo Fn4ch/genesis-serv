@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { HttpService } from '@nestjs/axios/dist';
 import { IGetTokenResp } from './models';
 import { firstValueFrom } from 'rxjs';
@@ -13,7 +13,6 @@ export class AppService {
       'https://test.gnzs.ru/oauth/get-token.php',
       {
         headers: {
-          Accept: 'application/json',
           'Content-Type': 'application/json',
           'X-Client-Id': '30878566',
         },
@@ -26,10 +25,10 @@ export class AppService {
     const { base_domain, access_token } = await this.getToken();
     try {
       const { data } = await firstValueFrom(
-        this.httpService.post(`https:${base_domain}/api/v4/leads`, {
+        this.httpService.post(`https://${base_domain}/api/v4/leads`, {
           headers: {
-            'Content-Type': 'application/json',
             Authorization: `Bearer ${access_token}`,
+            'Content-Type': 'application/json',
           },
         }),
       );
@@ -44,7 +43,7 @@ export class AppService {
     const { base_domain, access_token } = await this.getToken();
     try {
       const { data } = await firstValueFrom(
-        this.httpService.post(`https:${base_domain}/api/v4/contacts`, {
+        this.httpService.post(`https://${base_domain}/api/v4/contacts`, {
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${access_token}`,
@@ -62,7 +61,7 @@ export class AppService {
     const { base_domain, access_token } = await this.getToken();
     try {
       const { data } = await firstValueFrom(
-        this.httpService.post(`https:${base_domain}/api/v4/companiess`, {
+        this.httpService.post(`https://${base_domain}/api/v4/companiess`, {
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${access_token}`,
